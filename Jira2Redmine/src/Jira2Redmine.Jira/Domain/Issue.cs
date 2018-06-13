@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Jira2Redmine.Jira
+﻿namespace Jira2Redmine.Jira.Domain
 {
     public class Issue
     {

@@ -6,8 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Jira2Redmine.Jira\Jira2Redmine.Jira.csproj" />
-    <ProjectReference Include="..\Jira2Redmine.Redmine\Jira2Redmine.Redmine.csproj" />
+    <PackageReference Include="CommandLineParser" Version="2.2.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jira2Redmine.Sync\Jira2Redmine.Sync.csproj" />
   </ItemGroup>
 
 </Project>

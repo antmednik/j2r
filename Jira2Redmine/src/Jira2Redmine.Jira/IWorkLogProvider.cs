@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using Jira2Redmine.Jira.Domain;
 
 namespace Jira2Redmine.Jira
 {
-    interface IWorkLogProvider
+    public interface IWorkLogProvider
     {
-        IList<WorkLogItem> Get();
+        WorkLog Get(Stream stream);
     }
 }

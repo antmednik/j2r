@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Jira2Redmine.Console": {
+      "commandName": "Project",
+      "commandLineArgs": " -f \"C:\\tmp\\Timesheet Report.csv\" -r \"https://mc.usetech.ru/redmine\" -k \"5e446a7fbdf9064af025cbfe994bba616e2016be\" -p \"tui_vtour_res\" -i 25089"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Jira2Redmine.Jira
+namespace Jira2Redmine.Jira.Domain
 {
     public class WorkLogItem
     {

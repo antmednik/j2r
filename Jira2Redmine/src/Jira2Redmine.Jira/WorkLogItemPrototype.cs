@@ -1,4 +1,5 @@
 ﻿using System;
+using Jira2Redmine.Jira.Domain;
 
 namespace Jira2Redmine.Jira
 {

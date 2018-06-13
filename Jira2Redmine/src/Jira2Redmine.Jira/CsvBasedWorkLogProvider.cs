@@ -1,58 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Text;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using Jira2Redmine.Jira.Domain;
 
 namespace Jira2Redmine.Jira
 {
     public class CsvBasedWorkLogProvider : IWorkLogProvider
     {
-        private class TimeTableHeader
-        {
-            private readonly List<DateTime> _workDates = new List<DateTime>();
-            private readonly int _baseColumnOffset;
+        private const int DefaultCodePage = 1251;
 
-            public TimeTableHeader(int baseColumnOffset)
-            {
-                _baseColumnOffset = baseColumnOffset;
-            }
-
-            public void Add(DateTime workDate)
-            {
-                _workDates.Add(workDate);
-            }
-
-            public IEnumerable<(int columnIndex, DateTime workDate)> GetColumnIndexAndWorkDatePairs()
-            {
-                for (var index = 0; index < _workDates.Count; index++)
-                {
-                    yield return (index + _baseColumnOffset, _workDates[index]);
-                }
-            }
-        }
-
-        private static readonly string[] DefaultSeparator = { ";" };
+        private static readonly string[] DefaultFieldSeparator = { ";" };
         private static readonly Regex TimeTableBorderRegex = new Regex(@"^Total\s\(\d+ issues\)$", RegexOptions.Compiled);
 
-        private readonly string[] _separator;
+        private readonly string[] _fieldSeparator;
+        private readonly int _codePage;
 
         static CsvBasedWorkLogProvider()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
-        public CsvBasedWorkLogProvider(string separator = null)
+        public CsvBasedWorkLogProvider(string fieldSeparator = null, int? codePage = null)
         {
-            _separator = string.IsNullOrEmpty(separator) ? DefaultSeparator : new [] { separator };
+            _fieldSeparator = string.IsNullOrEmpty(fieldSeparator) ? DefaultFieldSeparator : new [] { fieldSeparator };
+            _codePage = codePage ?? DefaultCodePage;
         }
 
-        public IList<WorkLogItem> Get()
+        public WorkLog Get(Stream stream)
         {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+
             var workLogItems = new List<WorkLogItem>();
 
-            using (var reader = new StreamReader(@"C:\tmp\Timesheet Report.csv", Encoding.GetEncoding(1251)))
+            using (var reader = new StreamReader(stream, Encoding.GetEncoding(1251)))
             {
                 var line = reader.ReadLine();
 
@@ -76,16 +58,16 @@ namespace Jira2Redmine.Jira
                 }
             }
 
-            return workLogItems;
+            return new WorkLog(workLogItems);
         }
 
         private bool IsTimeTableBorderFound(string line)
         {
-            var fields = line.Split(_separator, StringSplitOptions.None);
+            var fields = line.Split(_fieldSeparator, StringSplitOptions.None);
             return TimeTableBorderRegex.IsMatch(fields[0]);
         }
 
-        private string ReadHeader(TextReader reader)
+        private static string ReadHeader(TextReader reader)
         {
             const string headerBordersMarker = "Project;Issue";
 
@@ -116,7 +98,7 @@ namespace Jira2Redmine.Jira
         {
             TimeTableHeader header = null;
             
-            var fields = rawHeader.Split(_separator, StringSplitOptions.None);
+            var fields = rawHeader.Split(_fieldSeparator, StringSplitOptions.None);
 
             int firstWorkDateIndex = -1;
             for (var index = 0; index < fields.Length; index++)
@@ -152,7 +134,7 @@ namespace Jira2Redmine.Jira
 
         private IEnumerable<WorkLogItem> Create(TimeTableHeader header, string line)
         {
-            var csvFileds = line.Split(_separator, StringSplitOptions.None);
+            var csvFileds = line.Split(_fieldSeparator, StringSplitOptions.None);
 
             var itemPrototype = new WorkLogItemPrototype(csvFileds[0], csvFileds[2].Trim(), csvFileds[3].Trim());
             
